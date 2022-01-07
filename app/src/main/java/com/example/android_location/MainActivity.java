@@ -63,8 +63,7 @@ public class MainActivity extends AppCompatActivity {
      * The fastest rate for active location updates. Exact. Updates will never be more frequent
      * than this value.
      */
-    private static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS =
-            UPDATE_INTERVAL_IN_MILLISECONDS / 2;
+    private static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS = UPDATE_INTERVAL_IN_MILLISECONDS / 2;
 
     // Keys for storing activity state in the Bundle.
     private final static String KEY_REQUESTING_LOCATION_UPDATES = "requesting-location-updates";
@@ -138,21 +137,6 @@ public class MainActivity extends AppCompatActivity {
         createLocationCallback();
         createLocationRequest();
         buildLocationSettingsRequest();
-
-        checkPermission();
-    }
-
-    // 位置情報許可の確認
-    public void checkPermission() {
-        // 既に許可している
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)== PackageManager.PERMISSION_GRANTED) {
-            startLocationUpdates();
-        }
-        // 拒否していた場合(初回起動も含めて)
-        else{
-            Log.d("debug", "requestLocationPermission()　------");
-            requestLocationPermission();
-        }
     }
 
     // 許可を求める
