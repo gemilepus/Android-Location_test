@@ -139,6 +139,11 @@ public class MainActivity extends AppCompatActivity {
         buildLocationSettingsRequest();
     }
 
+    private boolean checkPermissions() {
+        int permissionState = ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
+        return permissionState == PackageManager.PERMISSION_GRANTED;
+    }
+
     // 許可を求める
     private void requestLocationPermission() {
         if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
@@ -190,8 +195,7 @@ public class MainActivity extends AppCompatActivity {
                     public void onClick(View v) {
                         // Intent でアプリ権限の設定画面に移行
                         Intent intent = new Intent();
-                        intent.setAction(
-                                Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                        intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
                          //BuildConfigは反映するのに時間がかかってエラーにることもある。待つ
                         Uri uri = Uri.fromParts("package", BuildConfig.APPLICATION_ID, null);
                         intent.setData(uri);
@@ -249,8 +253,7 @@ public class MainActivity extends AppCompatActivity {
      * updates.
      */
     private void createLocationRequest() {
-        mLocationRequest = new LocationRequest();
-
+        mLocationRequest = LocationRequest.create();
         // Sets the desired interval for active location updates. This interval is
         // inexact. You may not receive updates at all if no location sources are available, or
         // you may receive them slower than requested. You may also receive updates faster than
@@ -293,23 +296,22 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode) {
-            // Check for the integer request code originally supplied to startResolutionForResult().
-            case REQUEST_CHECK_SETTINGS:
-                switch (resultCode) {
-                    case Activity.RESULT_OK:
-                        Log.i(TAG, "User agreed to make required location settings changes.");
-                        // Nothing to do. startLocationupdates() gets called in onResume again.
-                        startLocationUpdates();
+        super.onActivityResult(requestCode, resultCode, data);
+        // Check for the integer request code originally supplied to startResolutionForResult().
+        if (requestCode == REQUEST_CHECK_SETTINGS) {
+            switch (resultCode) {
+                case Activity.RESULT_OK:
+                    Log.i(TAG, "User agreed to make required location settings changes.");
+                    // Nothing to do. startLocationupdates() gets called in onResume again.
+                    startLocationUpdates();
 
-                        break;
-                    case Activity.RESULT_CANCELED:
-                        Log.i(TAG, "User chose not to make required location settings changes.");
-                        mRequestingLocationUpdates = false;
+                    break;
+                case Activity.RESULT_CANCELED:
+                    Log.i(TAG, "User chose not to make required location settings changes.");
+                    mRequestingLocationUpdates = false;
 
-                        break;
-                }
-                break;
+                    break;
+            }
         }
     }
 
@@ -423,11 +425,6 @@ public class MainActivity extends AppCompatActivity {
         savedInstanceState.putParcelable(KEY_LOCATION, mCurrentLocation);
         savedInstanceState.putString(KEY_LAST_UPDATED_TIME_STRING, mLastUpdateTime);
         super.onSaveInstanceState(savedInstanceState);
-    }
-
-    private boolean checkPermissions() {
-        int permissionState = ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
-        return permissionState == PackageManager.PERMISSION_GRANTED;
     }
 
     @Override
